@@ -1,13 +1,17 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>movie-details</ion-title>
+    <ion-title>Movie Details</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">movie-details</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding" *ngIf="movie">
+
+  <h2>{{ movie.title }}</h2>
+
+  <p><strong>Director:</strong> {{ movie.director }}</p>
+
+  <p><strong>Year:</strong> {{ movie.year }}</p>
+
+  <p><strong>Description:</strong> {{ movie.description }}</p>
+
 </ion-content>

@@ -1,20 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { MovieService } from '../../services/movie.service';
+import { Movie } from '../../services/movie.model';
 
 @Component({
   selector: 'app-movie-details',
   templateUrl: './movie-details.page.html',
-  styleUrls: ['./movie-details.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [CommonModule, IonicModule],
 })
 export class MovieDetailsPage implements OnInit {
 
-  constructor() { }
+  movie?: Movie;
+
+  constructor(
+    private route: ActivatedRoute,
+    private movieService: MovieService
+  ) {}
 
   ngOnInit() {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.movieService.getMovie(id).subscribe(data => {
+      this.movie = data;
+    });
   }
 
 }
