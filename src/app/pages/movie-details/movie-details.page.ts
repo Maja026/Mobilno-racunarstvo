@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common'; // <-- dodaj
 import { IonicModule } from '@ionic/angular';
+import { RouterModule } from '@angular/router'; // <-- dodaj za eventualni routerLink
 import { ActivatedRoute } from '@angular/router';
 import { MovieService } from '../../services/movie.service';
 import { Movie } from '../../services/movie.model';
@@ -9,7 +10,11 @@ import { Movie } from '../../services/movie.model';
   selector: 'app-movie-details',
   templateUrl: './movie-details.page.html',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [
+    CommonModule,   // <-- dodaj
+    IonicModule,
+    RouterModule    // <-- ako koristiš routerLink
+  ],
 })
 export class MovieDetailsPage implements OnInit {
 
@@ -21,11 +26,12 @@ export class MovieDetailsPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-
-    this.movieService.getMovie(id).subscribe(data => {
-      this.movie = data;
-    });
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.movieService.getMovie(id).subscribe(data => {
+        this.movie = data;
+        console.log('Movie details:', this.movie);
+      });
+    }
   }
-
 }

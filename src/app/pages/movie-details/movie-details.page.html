@@ -1,17 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Movie Details</ion-title>
+    <ion-title>{{ movie?.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding" *ngIf="movie">
+  <ion-img *ngIf="movie.imageURL" [src]="movie.imageURL.trim()"></ion-img>
 
   <h2>{{ movie.title }}</h2>
-
-  <p><strong>Director:</strong> {{ movie.director }}</p>
-
-  <p><strong>Year:</strong> {{ movie.year }}</p>
-
-  <p><strong>Description:</strong> {{ movie.description }}</p>
-
+  <p *ngIf="movie.description">{{ movie.description }}</p>
+  <p *ngIf="movie.type">Type: {{ movie.type }}</p>
+  <p *ngIf="movie.director">Director: {{ movie.director }}</p>
+  <p *ngIf="movie.year">Year: {{ movie.year }}</p>
 </ion-content>
