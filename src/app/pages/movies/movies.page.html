@@ -1,26 +1,54 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Movies</ion-title>
+    <ion-title>Movies / Series Rating App</ion-title>
+
     <ion-buttons slot="end">
       <ion-button (click)="logout()">Logout</ion-button>
     </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list>
-    <ion-item *ngFor="let movie of movies" [routerLink]="['/movie-details', movie.id]">
-      <ion-thumbnail slot="start" *ngIf="movie.imageURL">
-        <ion-img 
-          [src]="movie.imageURL.trim()" 
-          style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-        </ion-img>
-      </ion-thumbnail>
-      <ion-label>
-        <h2>{{ movie.title }}</h2>
-        <p *ngIf="movie.description">{{ movie.description }}</p>
-        <p *ngIf="movie.type">Type: {{ movie.type }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<ion-content>
+
+<ion-list>
+
+  <ion-item *ngFor="let movie of movies" (click)="goToDetails(movie.id!)">
+
+    <ion-thumbnail slot="start" *ngIf="movie.imageURL">
+      <img [src]="movie.imageURL.trim()" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
+    </ion-thumbnail>
+
+    <ion-label>
+      <h2>{{ movie.title }}</h2>
+
+      <p *ngIf="movie.description">
+        {{ movie.description }}
+      </p>
+
+      <p *ngIf="movie.type">
+        Type: {{ movie.type }}
+      </p>
+    </ion-label>
+
+    <ion-buttons slot="end">
+
+      <ion-button
+        color="primary"
+        (click)="addToWatchLater(movie.id!); $event.stopPropagation()">
+        Watch later
+      </ion-button>
+
+      <ion-button
+        color="success"
+        (click)="markAsSeen(movie.id!); $event.stopPropagation()">
+        Seen
+      </ion-button>
+
+    </ion-buttons>
+
+  </ion-item>
+
+</ion-list>
+
 </ion-content>

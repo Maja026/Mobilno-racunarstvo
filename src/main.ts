@@ -19,25 +19,16 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular(),
     provideRouter(routes),
 
-    // Firebase
-    provideFirebaseApp(() => {
-      const app = initializeApp(environment.firebaseConfig);
-      console.log('Firebase app initialized:', app);
-      return app;
-    }),
-    provideAuth(() => {
-      const auth = getAuth();
-      console.log('Auth initialized:', auth);
-      return auth;
-    }),
-    provideFirestore(() => {
-      const db = getFirestore();
-      console.log('Firestore initialized:', db);
-      return db;
-    }),
+    // Firebase App
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+
+    // Firebase Auth
+    provideAuth(() => getAuth()),
+
+    // Firestore
+    provideFirestore(() => getFirestore()),
 
     // Angular moduli
     importProvidersFrom(CommonModule, FormsModule, ReactiveFormsModule)
   ]
 });
-
