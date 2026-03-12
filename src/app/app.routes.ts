@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' }, // default ide na login
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
   {
     path: 'login',
     loadComponent: () =>
@@ -37,7 +38,8 @@ export const routes: Routes = [
   {
   path: 'profile',
   loadComponent: () =>
-    import('./pages/profile/profile.page').then((m) => m.ProfilePage),
+    import('./pages/profile/profile.page').then((m) => m.ProfilePage) // standalone component
 },
+
 
 ];

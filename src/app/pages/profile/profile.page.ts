@@ -6,6 +6,8 @@ import { MovieService } from '../../services/movie.service';
 import { Movie } from '../../services/movie.model';
 import { User } from '../../services/user.model';
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   IonHeader,
   IonToolbar,
@@ -18,11 +20,10 @@ import {
   IonLabel,
   IonThumbnail,
   IonSegment,
-  IonSegmentButton
+  IonSegmentButton,
+  ModalController
 } from '@ionic/angular/standalone';
-
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { RatingModalPage } from '../rating/rating-modal.page'; // standalone modal
 
 @Component({
   selector: 'app-profile',
@@ -44,7 +45,7 @@ import { FormsModule } from '@angular/forms';
     IonThumbnail,
     IonSegment,
     IonSegmentButton
-  ],
+  ]
 })
 export class ProfilePage implements OnInit {
 
@@ -53,13 +54,14 @@ export class ProfilePage implements OnInit {
   seenMovies: Movie[] = [];
 
   watchLaterFilter: 'movie' | 'series' = 'movie';
-  seenFilter: 'movie' | 'series' = 'movie'; 
+  seenFilter: 'movie' | 'series' = 'movie';
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
-    private movieService: MovieService
+    private movieService: MovieService,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
@@ -70,7 +72,6 @@ export class ProfilePage implements OnInit {
         this.watchLaterMovies = [];
         this.seenMovies = [];
 
-        // Mapiranje ID-eva iz watchLater i seen u potpune Movie objekte
         this.mapMovies(user.watchLater, 'watchLater');
         this.mapMovies(user.seen, 'seen');
       });
@@ -81,8 +82,12 @@ export class ProfilePage implements OnInit {
     movieIds.forEach(id => {
       this.movieService.getMovie(id).subscribe(movie => {
         if (movie) {
-          if (listType === 'watchLater') this.watchLaterMovies.push(movie);
-          if (listType === 'seen') this.seenMovies.push(movie);
+          if (listType === 'watchLater' && !this.watchLaterMovies.find(m => m.id === movie.id)) {
+            this.watchLaterMovies.push(movie);
+          }
+          if (listType === 'seen' && !this.seenMovies.find(m => m.id === movie.id)) {
+            this.seenMovies.push(movie);
+          }
         }
       });
     });
@@ -113,20 +118,27 @@ export class ProfilePage implements OnInit {
       });
   }
 
-  setWatchLaterFilter(filter: 'movie' | 'series') {   
+  setWatchLaterFilter(filter: 'movie' | 'series') {
     this.watchLaterFilter = filter;
   }
 
-  setSeenFilter(filter: 'movie' | 'series') {        
+  setSeenFilter(filter: 'movie' | 'series') {
     this.seenFilter = filter;
   }
 
-  get filteredWatchLater() {                           
+  get filteredWatchLater() {
     return this.watchLaterMovies.filter(m => m.type === this.watchLaterFilter);
   }
 
-  get filteredSeen() {                                  
+  get filteredSeen() {
     return this.seenMovies.filter(m => m.type === this.seenFilter);
   }
 
+  async openRatingModal(movie: Movie) {
+    const modal = await this.modalCtrl.create({
+      component: RatingModalPage,
+      componentProps: { movie }
+    });
+    await modal.present();
+  }
 }

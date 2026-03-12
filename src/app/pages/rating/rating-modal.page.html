@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Rate "{{ movie.title }}"</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-label>Rating</ion-label>
+  <ion-select [(ngModel)]="ratingValue">
+    <ion-select-option *ngFor="let i of [1,2,3,4,5]" [value]="i">{{i}}</ion-select-option>
+  </ion-select>
+
+  <ion-label>Comment</ion-label>
+  <ion-textarea [(ngModel)]="comment"></ion-textarea>
+
+  <ion-button expand="full" (click)="submitRating()">Send</ion-button>
+</ion-content>
