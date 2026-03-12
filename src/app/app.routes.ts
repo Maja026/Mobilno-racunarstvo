@@ -34,4 +34,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/add-movie/add-movie.page').then((m) => m.AddMoviePage),
   },
+  {
+  path: 'profile',
+  loadComponent: () =>
+    import('./pages/profile/profile.page').then((m) => m.ProfilePage),
+},
+
 ];

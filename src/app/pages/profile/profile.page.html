@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>My Profile</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">Logout</ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- ================= WATCH LATER ================= -->
+  <h2 style="margin: 10px;">Watch Later</h2>
+
+  <!-- Segment za filter po tipu -->
+  <ion-segment [(ngModel)]="watchLaterFilter" (ionChange)="setWatchLaterFilter(watchLaterFilter)" color="primary">
+    <ion-segment-button value="movie">Movies</ion-segment-button>   
+    <ion-segment-button value="series">Series</ion-segment-button>  
+  </ion-segment>
+
+  <ion-list>
+    <!-- filtrirano po tipu -->
+    <ion-item *ngFor="let movie of filteredWatchLater" (click)="goToDetails(movie.id!)">
+      <ion-thumbnail slot="start" *ngIf="movie.imageURL">
+        <img [src]="movie.imageURL" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ movie.title }}</h2>
+        <p *ngIf="movie.type">Type: {{ movie.type }}</p>
+      </ion-label>
+      <!-- dugme za uklanjanje iz liste -->
+      <ion-button slot="end" color="danger" (click)="removeFromWatchLater(movie.id!); $event.stopPropagation()">
+        Remove <!-- ovo dodaj -->
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <!-- ================= SEEN ================= -->
+  <h2 style="margin: 10px;">Seen</h2>
+
+  <!-- Segment za filter po tipu -->
+  <ion-segment [(ngModel)]="seenFilter" (ionChange)="setSeenFilter(seenFilter)" color="primary">
+    <ion-segment-button value="movie">Movies</ion-segment-button>   
+    <ion-segment-button value="series">Series</ion-segment-button> 
+  </ion-segment>
+
+  <ion-list>
+    <!-- filtrirano po tipu -->
+    <ion-item *ngFor="let movie of filteredSeen" (click)="goToDetails(movie.id!)">
+      <ion-thumbnail slot="start" *ngIf="movie.imageURL">
+        <img [src]="movie.imageURL" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ movie.title }}</h2>
+        <p *ngIf="movie.type">Type: {{ movie.type }}</p>
+      </ion-label>
+      <!-- dugme za uklanjanje iz liste -->
+      <ion-button slot="end" color="danger" (click)="removeFromSeen(movie.id!); $event.stopPropagation()">
+        Remove
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

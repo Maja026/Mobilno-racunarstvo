@@ -110,4 +110,9 @@ export class MoviesPage implements OnInit {
     this.router.navigate(['/movie-details', movieId]);
   }
 
+  goToProfile() {
+  this.router.navigate(['/profile']);
+}
+
+
 }
