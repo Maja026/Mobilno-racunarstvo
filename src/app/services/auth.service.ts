@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, User } from '@angular/fire/auth';
+import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  constructor(private auth: Auth) {}
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore
+  ) {}
 
   // Login korisnika
   login(email: string, password: string): Promise<void> {
@@ -17,14 +20,25 @@ export class AuthService {
       .catch(err => { throw err; });
   }
 
-  // Registracija korisnika
+  // Registracija korisnika + pravljenje dokumenta u Firestore
   register(email: string, password: string): Promise<void> {
     return createUserWithEmailAndPassword(this.auth, email, password)
+      .then((userCredential) => {
+
+        const uid = userCredential.user.uid;
+
+        return setDoc(doc(this.firestore, 'users', uid), {
+          email: email,
+          watchLater: [],
+          seen: []
+        });
+
+      })
       .then(() => {})
       .catch(err => { throw err; });
   }
 
-  // Logout korisnika
+  // Logout
   logout(): Promise<void> {
     return signOut(this.auth);
   }
@@ -34,12 +48,12 @@ export class AuthService {
     return !!this.auth.currentUser;
   }
 
-  // Dohvata UID trenutnog korisnika
+  // UID trenutnog korisnika
   getCurrentUserUid(): string | null {
     return this.auth.currentUser ? this.auth.currentUser.uid : null;
   }
 
-  // Opcionalno: observable trenutnog korisnika
+  // Observable korisnika
   getCurrentUser(): Observable<User | null> {
     return of(this.auth.currentUser);
   }

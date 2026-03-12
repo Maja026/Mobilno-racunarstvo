@@ -5,6 +5,7 @@ import { UserService } from '../../services/user.service';
 import { Movie } from '../../services/movie.model';
 import { User } from '../../services/user.model';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import {
   IonHeader,
@@ -16,7 +17,9 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonThumbnail
+  IonThumbnail,
+  IonSegment,
+  IonSegmentButton
 } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
@@ -28,6 +31,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -37,13 +41,17 @@ import { CommonModule } from '@angular/common';
     IonList,
     IonItem,
     IonLabel,
-    IonThumbnail
+    IonThumbnail,
+    IonSegment,
+    IonSegmentButton
   ],
 })
 export class MoviesPage implements OnInit {
 
   movies: Movie[] = [];
+  filteredMovies: Movie[] = [];
   currentUser: User | null = null;
+  filter: 'movie' | 'series' = 'movie'; // default filter
 
   constructor(
     private router: Router,
@@ -53,22 +61,30 @@ export class MoviesPage implements OnInit {
   ) {}
 
   ngOnInit() {
-
     this.movieService.getMovies().subscribe({
       next: data => {
         this.movies = data;
+        this.applyFilter();
         console.log('Movies loaded:', this.movies);
       },
       error: err => console.error(err)
     });
 
     const uid = this.authService.getCurrentUserUid();
-
     if (uid) {
       this.userService.getUserData(uid).subscribe(user => {
         this.currentUser = user;
       });
     }
+  }
+
+  applyFilter() {
+    this.filteredMovies = this.movies.filter(m => m.type === this.filter);
+  }
+
+  setFilter(type: 'movie' | 'series') {
+    this.filter = type;
+    this.applyFilter();
   }
 
   logout() {
@@ -95,5 +111,3 @@ export class MoviesPage implements OnInit {
   }
 
 }
-
-
