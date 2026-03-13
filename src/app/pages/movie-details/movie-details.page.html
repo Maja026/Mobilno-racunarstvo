@@ -12,4 +12,20 @@
   <p *ngIf="movie.type">Type: {{ movie.type }}</p>
   <p *ngIf="movie.director">Director: {{ movie.director }}</p>
   <p *ngIf="movie.year">Year: {{ movie.year }}</p>
+
+  <hr>
+
+  <h3>Average Rating: {{ averageRating | number:'1.1-1' }}</h3>
+
+  <ion-list *ngIf="ratings.length > 0">
+    <ion-item *ngFor="let r of ratings">
+      <ion-label>
+        <h4>Rating: {{ r.rating }}/5</h4>
+        <p>{{ r.comment }}</p>
+        <small>User ID: {{ r.userId }}</small>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <p *ngIf="ratings.length === 0">No ratings yet for this movie.</p>
 </ion-content>
