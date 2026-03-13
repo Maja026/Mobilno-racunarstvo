@@ -132,11 +132,12 @@ export class ProfilePage implements OnInit {
     return this.seenMovies.filter(m => m.type === this.seenFilter);
   }
 
-  async openRatingModal(movie: Movie) {
-    const modal = await this.modalCtrl.create({
-      component: RatingModalPage as any, 
-      componentProps: { movie }
-    });
-    await modal.present();
-  }
+async openRatingModal(movie: Movie) {
+  const modal = await this.modalCtrl.create({
+    component: RatingModalPage as any,
+    componentProps: { movie }
+  });
+  await modal.present();
+}
+
 }

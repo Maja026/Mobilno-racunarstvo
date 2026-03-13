@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, doc, setDoc, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, doc, setDoc, query, where, getDocs, Timestamp } from '@angular/fire/firestore';
 
 export interface Rating {
   movieId: string;
@@ -15,11 +15,13 @@ export interface Rating {
 export class RatingService {
   constructor(private firestore: Firestore) {}
 
-  // Dodavanje nove ocene
+  // Dodavanje ili izmena ocene
   addRating(rating: Rating) {
-    // ID dokumenta može biti kombinacija userId + movieId da bi korisnik mogao da menja ocenu
     const docRef = doc(this.firestore, `ratings/${rating.userId}_${rating.movieId}`);
-    return setDoc(docRef, { ...rating, timestamp: new Date() });
+    return setDoc(docRef, {
+      ...rating,
+      timestamp: Timestamp.now()  // automatsko vreme Firestore
+    });
   }
 
   // Dohvati sve ocene za jedan film

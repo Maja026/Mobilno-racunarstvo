@@ -44,7 +44,11 @@ export class RatingModalPage {
   ratingValue = 5;
   comment = '';
 
-  constructor(private modalCtrl: ModalController, private ratingService: RatingService, private authService: AuthService) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private ratingService: RatingService,
+    private authService: AuthService
+  ) {}
 
   async submitRating() {
     const userId = this.authService.getCurrentUserUid();
@@ -57,7 +61,7 @@ export class RatingModalPage {
       comment: this.comment
     };
 
-    await this.ratingService.addRating(newRating);
+    await this.ratingService.addRating(newRating); // sada ide u Firestore
     this.modalCtrl.dismiss();
   }
 
