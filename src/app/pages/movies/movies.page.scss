@@ -1,0 +1,30 @@
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.header-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 5px;
+}
+.description {
+  display: -webkit-box;           /* koristi fleksibilnu kutiju za webkit */
+  -webkit-line-clamp: 2;          /* broj redova koji će se prikazati */
+  -webkit-box-orient: vertical;   /* vertikalna orijentacija za kutiju */
+  overflow: hidden;               /* sakriva višak teksta */
+  text-overflow: ellipsis;        /* dodaje "..." na kraju */
+  white-space: normal;            /* dozvoljava višeredni tekst */
+}
+ion-searchbar {
+  margin: 10px 0;
+}

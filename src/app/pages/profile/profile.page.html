@@ -15,9 +15,6 @@
   </ion-toolbar>
 </ion-header>
 
-
-
-
 <ion-content class="ion-padding">
 
   <h2>Watch Later</h2>
@@ -34,6 +31,10 @@
       <ion-label>
         <h2>{{ movie.title }}</h2>
         <p *ngIf="movie.type">Type: {{ movie.type }}</p>
+        <!-- Skraćeni opis -->
+        <p *ngIf="movie.description" class="short-description">
+          {{ movie.description }}
+        </p>
       </ion-label>
       <ion-button slot="end" color="danger" (click)="removeFromWatchLater(movie.id!); $event.stopPropagation()">Remove</ion-button>
     </ion-item>
@@ -53,10 +54,13 @@
       <ion-label>
         <h2>{{ movie.title }}</h2>
         <p *ngIf="movie.type">Type: {{ movie.type }}</p>
+        <!-- Skraćeni opis -->
+        <p *ngIf="movie.description" class="short-description">
+          {{ movie.description }}
+        </p>
       </ion-label>
       <ion-button slot="end" color="danger" (click)="removeFromSeen(movie.id!); $event.stopPropagation()">Remove</ion-button>
       <ion-button slot="end" color="warning" (click)="openRatingModal(movie); $event.stopPropagation()">Rate</ion-button>
-
     </ion-item>
   </ion-list>
 

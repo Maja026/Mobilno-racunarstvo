@@ -19,7 +19,8 @@ import {
   IonLabel,
   IonThumbnail,
   IonSegment,
-  IonSegmentButton
+  IonSegmentButton,
+  IonSearchbar
 } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
@@ -43,7 +44,8 @@ import { CommonModule } from '@angular/common';
     IonLabel,
     IonThumbnail,
     IonSegment,
-    IonSegmentButton
+    IonSegmentButton,
+    IonSearchbar
   ],
 })
 export class MoviesPage implements OnInit {
@@ -52,6 +54,7 @@ export class MoviesPage implements OnInit {
   filteredMovies: Movie[] = [];
   currentUser: User | null = null;
   filter: 'movie' | 'series' = 'movie'; // default filter
+  searchTerm: string = ''; // tekst za pretragu
 
   constructor(
     private router: Router,
@@ -78,8 +81,11 @@ export class MoviesPage implements OnInit {
     }
   }
 
+  // Kombinovani filter: segment + search
   applyFilter() {
-    this.filteredMovies = this.movies.filter(m => m.type === this.filter);
+    this.filteredMovies = this.movies
+      .filter(m => m.type === this.filter)
+      .filter(m => m.title.toLowerCase().includes(this.searchTerm.toLowerCase()));
   }
 
   setFilter(type: 'movie' | 'series') {
@@ -111,8 +117,7 @@ export class MoviesPage implements OnInit {
   }
 
   goToProfile() {
-  this.router.navigate(['/profile']);
-}
-
+    this.router.navigate(['/profile']);
+  }
 
 }
