@@ -7,10 +7,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
 
-  <h2 style="margin: 10px;">Watch Later</h2>
-  <ion-segment [(ngModel)]="watchLaterFilter" (ionChange)="setWatchLaterFilter(watchLaterFilter)" color="primary">
+  <h2>Watch Later</h2>
+  <ion-segment [(ngModel)]="watchLaterFilter">
     <ion-segment-button value="movie">Movies</ion-segment-button>
     <ion-segment-button value="series">Series</ion-segment-button>
   </ion-segment>
@@ -28,8 +28,8 @@
     </ion-item>
   </ion-list>
 
-  <h2 style="margin: 10px;">Seen</h2>
-  <ion-segment [(ngModel)]="seenFilter" (ionChange)="setSeenFilter(seenFilter)" color="primary">
+  <h2>Seen</h2>
+  <ion-segment [(ngModel)]="seenFilter">
     <ion-segment-button value="movie">Movies</ion-segment-button>
     <ion-segment-button value="series">Series</ion-segment-button>
   </ion-segment>

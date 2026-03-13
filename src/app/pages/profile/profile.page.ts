@@ -23,7 +23,8 @@ import {
   IonSegmentButton,
   ModalController
 } from '@ionic/angular/standalone';
-import { RatingModalPage } from '../rating/rating-modal.page'; // standalone modal
+
+import { RatingModalPage } from '../rating/rating-modal.page';
 
 @Component({
   selector: 'app-profile',
@@ -48,7 +49,6 @@ import { RatingModalPage } from '../rating/rating-modal.page'; // standalone mod
   ]
 })
 export class ProfilePage implements OnInit {
-
   currentUser: User | null = null;
   watchLaterMovies: Movie[] = [];
   seenMovies: Movie[] = [];
@@ -71,7 +71,6 @@ export class ProfilePage implements OnInit {
         this.currentUser = user;
         this.watchLaterMovies = [];
         this.seenMovies = [];
-
         this.mapMovies(user.watchLater, 'watchLater');
         this.mapMovies(user.seen, 'seen');
       });
@@ -98,8 +97,7 @@ export class ProfilePage implements OnInit {
   }
 
   logout() {
-    this.authService.logout()
-      .then(() => this.router.navigate(['/login']));
+    this.authService.logout().then(() => this.router.navigate(['/login']));
   }
 
   removeFromWatchLater(movieId: string) {
@@ -136,7 +134,7 @@ export class ProfilePage implements OnInit {
 
   async openRatingModal(movie: Movie) {
     const modal = await this.modalCtrl.create({
-      component: RatingModalPage,
+      component: RatingModalPage as any, 
       componentProps: { movie }
     });
     await modal.present();

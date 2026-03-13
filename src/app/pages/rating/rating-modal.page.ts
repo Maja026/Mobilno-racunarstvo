@@ -1,13 +1,23 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 import { RatingService, Rating } from '../../services/rating.service';
 import { Movie } from '../../services/movie.model';
 
-// standalone imports za sve Ionic komponente koje koristimo
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonLabel, IonSelect, IonSelectOption, IonTextarea } from '@ionic/angular/standalone';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonContent,
+  IonLabel,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-rating-modal',
@@ -31,14 +41,10 @@ import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, Ion
 export class RatingModalPage {
   @Input() movie!: Movie;
 
-  ratingValue: number = 5;
-  comment: string = '';
+  ratingValue = 5;
+  comment = '';
 
-  constructor(
-    private modalCtrl: ModalController,
-    private ratingService: RatingService,
-    private authService: AuthService
-  ) {}
+  constructor(private modalCtrl: ModalController, private ratingService: RatingService, private authService: AuthService) {}
 
   async submitRating() {
     const userId = this.authService.getCurrentUserUid();
