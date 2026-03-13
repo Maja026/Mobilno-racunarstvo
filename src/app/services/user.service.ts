@@ -15,6 +15,21 @@ export class UserService {
     return docData(userRef, { idField: 'uid' }) as Observable<User>;
   }
 
+  // Kreira korisnika ako ne postoji
+  async createUserIfNotExists(uid: string, email: string) {
+    const userRef = doc(this.firestore, `users/${uid}`);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      const newUser: User = {
+        uid,
+        email,
+        watchLater: [],
+        seen: []
+      };
+      await setDoc(userRef, newUser);
+    }
+  }
+
   // Dodavanje u Watch Later uz uklanjanje iz Seen ako je tamo
   addToWatchLater(uid: string, movieId: string) {
     const userRef = doc(this.firestore, `users/${uid}`);

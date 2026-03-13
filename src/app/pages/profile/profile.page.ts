@@ -5,6 +5,7 @@ import { UserService } from '../../services/user.service';
 import { MovieService } from '../../services/movie.service';
 import { Movie } from '../../services/movie.model';
 import { User } from '../../services/user.model';
+import { IonIcon } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -45,7 +46,8 @@ import { RatingModalPage } from '../rating/rating-modal.page';
     IonLabel,
     IonThumbnail,
     IonSegment,
-    IonSegmentButton
+    IonSegmentButton,
+    IonIcon
   ]
 })
 export class ProfilePage implements OnInit {
@@ -64,9 +66,15 @@ export class ProfilePage implements OnInit {
     private modalCtrl: ModalController
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     const uid = this.authService.getCurrentUserUid();
-    if (uid) {
+    const email = this.authService.getCurrentUserEmail();
+
+    if (uid && email) {
+      // Kreiraj dokument u Firestore ako ne postoji
+      await this.userService.createUserIfNotExists(uid, email);
+
+      // Učitaj podatke korisnika
       this.userService.getUserData(uid).subscribe(user => {
         this.currentUser = user;
         this.watchLaterMovies = [];
@@ -132,12 +140,16 @@ export class ProfilePage implements OnInit {
     return this.seenMovies.filter(m => m.type === this.seenFilter);
   }
 
-async openRatingModal(movie: Movie) {
-  const modal = await this.modalCtrl.create({
-    component: RatingModalPage as any,
-    componentProps: { movie }
-  });
-  await modal.present();
+  async openRatingModal(movie: Movie) {
+    const modal = await this.modalCtrl.create({
+      component: RatingModalPage as any,
+      componentProps: { movie }
+    });
+    await modal.present();
+  }
+
+  goBack() {
+  this.router.navigate(['/movies']); // vraća na stranicu sa svim filmovima
 }
 
 }

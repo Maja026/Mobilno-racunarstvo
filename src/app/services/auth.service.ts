@@ -24,15 +24,13 @@ export class AuthService {
   register(email: string, password: string): Promise<void> {
     return createUserWithEmailAndPassword(this.auth, email, password)
       .then((userCredential) => {
-
         const uid = userCredential.user.uid;
-
         return setDoc(doc(this.firestore, 'users', uid), {
-          email: email,
+          uid,
+          email,
           watchLater: [],
           seen: []
         });
-
       })
       .then(() => {})
       .catch(err => { throw err; });
@@ -43,14 +41,14 @@ export class AuthService {
     return signOut(this.auth);
   }
 
-  // Provera da li je korisnik ulogovan
-  isLoggedIn(): boolean {
-    return !!this.auth.currentUser;
-  }
-
   // UID trenutnog korisnika
   getCurrentUserUid(): string | null {
     return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
+
+  // Email trenutnog korisnika
+  getCurrentUserEmail(): string | null {
+    return this.auth.currentUser ? this.auth.currentUser.email : null;
   }
 
   // Observable korisnika

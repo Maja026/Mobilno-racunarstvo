@@ -1,11 +1,18 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <!-- Dugme za nazad -->
+      <ion-button (click)="goBack()" color="light">
+        Go Back
+      </ion-button>
+    </ion-buttons>
+
     <ion-title>{{ movie?.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding" *ngIf="movie">
-  <ion-img *ngIf="movie.imageURL" [src]="movie.imageURL.trim()"></ion-img>
+  <ion-img *ngIf="movie.imageURL" [src]="movie.imageURL.trim()" style="border-radius: 8px; margin-bottom: 16px;"></ion-img>
 
   <h2>{{ movie.title }}</h2>
   <p *ngIf="movie.description">{{ movie.description }}</p>
@@ -13,7 +20,7 @@
   <p *ngIf="movie.director">Director: {{ movie.director }}</p>
   <p *ngIf="movie.year">Year: {{ movie.year }}</p>
 
-  <hr>
+  <hr style="margin: 20px 0;">
 
   <h3>Average Rating: {{ averageRating | number:'1.1-1' }}</h3>
 
@@ -23,6 +30,7 @@
         <h4>Rating: {{ r.rating }}/5</h4>
         <p>{{ r.comment }}</p>
         <small>User ID: {{ r.userId }}</small>
+
       </ion-label>
     </ion-item>
   </ion-list>

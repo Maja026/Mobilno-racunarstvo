@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MovieService } from '../../services/movie.service';
 import { RatingService, Rating } from '../../services/rating.service';
 import { Movie } from '../../services/movie.model';
+import { Location } from '@angular/common';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-movie-details',
@@ -14,6 +15,7 @@ import { Movie } from '../../services/movie.model';
   imports: [CommonModule, IonicModule, RouterModule],
 })
 export class MovieDetailsPage implements OnInit {
+
   movie?: Movie;
   ratings: Rating[] = [];
   averageRating: number = 0;
@@ -21,7 +23,8 @@ export class MovieDetailsPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private movieService: MovieService,
-    private ratingService: RatingService
+    private ratingService: RatingService,
+    private location: Location
   ) {}
 
   ngOnInit() {
@@ -29,21 +32,22 @@ export class MovieDetailsPage implements OnInit {
     if (id) {
       this.movieService.getMovie(id).subscribe(data => {
         this.movie = data;
-        console.log('Movie details:', this.movie);
       });
 
-      // Dohvati ocene za film
-      this.loadRatings(id);
+      // Učitaj sve ocene za film
+      this.ratingService.getRatingsForMovie(id).then(ratings => {
+        this.ratings = ratings;
+
+        if (ratings.length > 0) {
+          this.averageRating = ratings
+            .map(r => r.rating)
+            .reduce((a, b) => a + b, 0) / ratings.length;
+        }
+      });
     }
   }
 
-  async loadRatings(movieId: string) {
-    this.ratings = await this.ratingService.getRatingsForMovie(movieId);
-    if (this.ratings.length > 0) {
-      const sum = this.ratings.reduce((acc, r) => acc + r.rating, 0);
-      this.averageRating = sum / this.ratings.length;
-    } else {
-      this.averageRating = 0;
-    }
+  goBack() {
+    this.location.back(); // vraća korisnika na prethodnu stranicu
   }
 }
