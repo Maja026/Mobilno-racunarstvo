@@ -1,29 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { 
+  IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, 
+  IonList, IonItem, IonLabel, IonThumbnail, IonSegment, IonSegmentButton, IonSearchbar 
+} from '@ionic/angular/standalone';
+
 import { AuthService } from '../../services/auth.service';
 import { MovieService } from '../../services/movie.service';
 import { UserService } from '../../services/user.service';
 import { Movie } from '../../services/movie.model';
 import { User } from '../../services/user.model';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonThumbnail,
-  IonSegment,
-  IonSegmentButton,
-  IonSearchbar
-} from '@ionic/angular/standalone';
-
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-movies',
@@ -49,12 +37,11 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class MoviesPage implements OnInit {
-
   movies: Movie[] = [];
   filteredMovies: Movie[] = [];
   currentUser: User | null = null;
-  filter: 'movie' | 'series' = 'movie'; // default filter
-  searchTerm: string = ''; // tekst za pretragu
+  filter: 'movie' | 'series' = 'movie';
+  searchTerm: string = '';
 
   constructor(
     private router: Router,
@@ -64,24 +51,26 @@ export class MoviesPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.loadMovies();
+    this.loadCurrentUser();
+  }
+
+  private loadMovies() {
     this.movieService.getMovies().subscribe({
       next: data => {
         this.movies = data;
         this.applyFilter();
-        console.log('Movies loaded:', this.movies);
       },
-      error: err => console.error(err)
+      error: err => console.error('Error loading movies:', err)
     });
-
-    const uid = this.authService.getCurrentUserUid();
-    if (uid) {
-      this.userService.getUserData(uid).subscribe(user => {
-        this.currentUser = user;
-      });
-    }
   }
 
-  // Kombinovani filter: segment + search
+  private loadCurrentUser() {
+    this.userService.getUserData().subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
   applyFilter() {
     this.filteredMovies = this.movies
       .filter(m => m.type === this.filter)
@@ -93,23 +82,39 @@ export class MoviesPage implements OnInit {
     this.applyFilter();
   }
 
+  onSearchChange(event: any) {
+    this.searchTerm = event.detail.value;
+    this.applyFilter();
+  }
+
   logout() {
-    this.authService.logout()
-      .then(() => this.router.navigate(['/login']));
+    this.authService.logout().then(() => this.router.navigate(['/login']));
   }
 
   addToWatchLater(movieId: string) {
     if (!this.currentUser) return;
 
-    this.userService.addToWatchLater(this.currentUser.uid, movieId)
-      .then(() => console.log('Added to Watch Later'));
+    const exists = !!this.currentUser.watchLater?.[movieId];
+    const action = exists ? this.userService.removeFromWatchLater(movieId) : this.userService.addToWatchLater(movieId);
+
+    action.then(() => {
+      if (!this.currentUser) return;
+      if (!this.currentUser.watchLater) this.currentUser.watchLater = {};
+      exists ? delete this.currentUser.watchLater[movieId] : this.currentUser.watchLater[movieId] = true;
+    }).catch(err => console.error(err));
   }
 
   markAsSeen(movieId: string) {
     if (!this.currentUser) return;
 
-    this.userService.markAsSeen(this.currentUser.uid, movieId)
-      .then(() => console.log('Marked as Seen'));
+    const exists = !!this.currentUser.seen?.[movieId];
+    const action = exists ? this.userService.removeFromSeen(movieId) : this.userService.markAsSeen(movieId);
+
+    action.then(() => {
+      if (!this.currentUser) return;
+      if (!this.currentUser.seen) this.currentUser.seen = {};
+      exists ? delete this.currentUser.seen[movieId] : this.currentUser.seen[movieId] = true;
+    }).catch(err => console.error(err));
   }
 
   goToDetails(movieId: string) {
@@ -120,4 +125,11 @@ export class MoviesPage implements OnInit {
     this.router.navigate(['/profile']);
   }
 
+  isMovieSeen(movieId: string): boolean {
+    return !!this.currentUser?.seen?.[movieId];
+  }
+
+  isMovieInWatchLater(movieId: string): boolean {
+    return !!this.currentUser?.watchLater?.[movieId];
+  }
 }

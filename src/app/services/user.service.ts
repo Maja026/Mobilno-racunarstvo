@@ -1,86 +1,96 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, docData, updateDoc, arrayUnion, getDoc, setDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { User } from '../services/user.model';
+import { Database, ref, set, remove, get } from '@angular/fire/database';
+import { Auth } from '@angular/fire/auth';
+import { Observable, from, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { User } from './user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private firestore: Firestore) {}
+  constructor(private db: Database, private auth: Auth) {}
 
-  getUserData(uid: string): Observable<User> {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    return docData(userRef, { idField: 'uid' }) as Observable<User>;
-  }
+  async createUserIfNotExists(): Promise<void> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return;
 
-  // Kreira korisnika ako ne postoji
-  async createUserIfNotExists(uid: string, email: string) {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      const newUser: User = {
-        uid,
-        email,
-        watchLater: [],
-        seen: []
-      };
-      await setDoc(userRef, newUser);
+    const userRef = ref(this.db, `users/${currentUser.uid}`);
+    const snapshot = await get(userRef);
+    if (!snapshot.exists()) {
+      await set(userRef, {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        watchLater: {},
+        seen: {}
+      });
     }
   }
 
-  // Dodavanje u Watch Later uz uklanjanje iz Seen ako je tamo
-  addToWatchLater(uid: string, movieId: string) {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    return getDoc(userRef).then(docSnap => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as User;
-        const seen = data.seen.filter(id => id !== movieId);
-        const watchLater = data.watchLater.includes(movieId) ? data.watchLater : [...data.watchLater, movieId];
-        return setDoc(userRef, { watchLater, seen }, { merge: true });
-      }
-      return Promise.reject('User not found');
-    });
+  getUserData(): Observable<User | null> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return of(null);
+
+    const userRef = ref(this.db, `users/${currentUser.uid}`);
+    return from(get(userRef)).pipe(
+      map(snapshot => snapshot.exists() ? snapshot.val() as User : null)
+    );
   }
 
-  // Dodavanje u Seen uz uklanjanje iz Watch Later ako je tamo
-  markAsSeen(uid: string, movieId: string) {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    return getDoc(userRef).then(docSnap => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as User;
-        const watchLater = data.watchLater.filter(id => id !== movieId);
-        const seen = data.seen.includes(movieId) ? data.seen : [...data.seen, movieId];
-        return setDoc(userRef, { watchLater, seen }, { merge: true });
-      }
-      return Promise.reject('User not found');
-    });
+  async addToWatchLater(movieId: string) {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return;
+    await set(ref(this.db, `users/${currentUser.uid}/watchLater/${movieId}`), true);
   }
 
-  // Brisanje iz Watch Later
-  removeFromWatchLater(uid: string, movieId: string) {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    return getDoc(userRef).then(docSnap => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as User;
-        const watchLater = data.watchLater.filter(id => id !== movieId);
-        return setDoc(userRef, { watchLater }, { merge: true });
-      }
-      return Promise.reject('User not found');
-    });
+  async removeFromWatchLater(movieId: string) {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return;
+    await remove(ref(this.db, `users/${currentUser.uid}/watchLater/${movieId}`));
   }
 
-  // Brisanje iz Seen
-  removeFromSeen(uid: string, movieId: string) {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    return getDoc(userRef).then(docSnap => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as User;
-        const seen = data.seen.filter(id => id !== movieId);
-        return setDoc(userRef, { seen }, { merge: true });
-      }
-      return Promise.reject('User not found');
-    });
+  async markAsSeen(movieId: string) {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return;
+    await set(ref(this.db, `users/${currentUser.uid}/seen/${movieId}`), true);
+  }
+
+  async removeFromSeen(movieId: string) {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return;
+    await remove(ref(this.db, `users/${currentUser.uid}/seen/${movieId}`));
+  }
+
+  getSeenMovies(): Observable<string[]> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return of([]);
+    const seenRef = ref(this.db, `users/${currentUser.uid}/seen`);
+    return from(get(seenRef)).pipe(
+      map(snapshot => snapshot.exists() ? Object.keys(snapshot.val()) : [])
+    );
+  }
+
+  getWatchLaterMovies(): Observable<string[]> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return of([]);
+    const watchLaterRef = ref(this.db, `users/${currentUser.uid}/watchLater`);
+    return from(get(watchLaterRef)).pipe(
+      map(snapshot => snapshot.exists() ? Object.keys(snapshot.val()) : [])
+    );
+  }
+
+  async isMovieSeen(movieId: string): Promise<boolean> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return false;
+    const snapshot = await get(ref(this.db, `users/${currentUser.uid}/seen/${movieId}`));
+    return snapshot.exists();
+  }
+
+  async isMovieInWatchLater(movieId: string): Promise<boolean> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return false;
+    const snapshot = await get(ref(this.db, `users/${currentUser.uid}/watchLater/${movieId}`));
+    return snapshot.exists();
   }
 }

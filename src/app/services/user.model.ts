@@ -1,7 +1,6 @@
-
 export interface User {
-  uid: string; 
+  uid?: string;
   email: string;
-  watchLater: string[];    
-  seen: string[];          
+  watchLater: { [movieId: string]: boolean };
+  seen: { [movieId: string]: boolean };
 }

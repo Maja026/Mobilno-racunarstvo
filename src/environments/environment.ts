@@ -8,7 +8,8 @@ export const environment = {
     storageBucket: "movie-rating-app-maja.firebasestorage.app",
     messagingSenderId: "507618418693",
     appId: "1:507618418693:web:5fcadd35f893b6304abc6c",
-    measurementId: "G-9GLD9SRC48"
+    measurementId: "G-9GLD9SRC48",
+    databaseURL: "https://movie-rating-app-maja-default-rtdb.firebaseio.com"
   }
 
 };

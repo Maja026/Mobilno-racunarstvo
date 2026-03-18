@@ -1,53 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule, ModalController } from '@ionic/angular';
+
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { MovieService } from '../../services/movie.service';
 import { Movie } from '../../services/movie.model';
 import { User } from '../../services/user.model';
-import { IonIcon } from '@ionic/angular/standalone';
-
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonThumbnail,
-  IonSegment,
-  IonSegmentButton,
-  ModalController
-} from '@ionic/angular/standalone';
-
 import { RatingModalPage } from '../rating/rating-modal.page';
 
 @Component({
   selector: 'app-profile',
+  standalone: true,
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonThumbnail,
-    IonSegment,
-    IonSegmentButton,
-    IonIcon
+    IonicModule, // <-- ovo sadrži sve Ionic komponente i providere
   ]
 })
 export class ProfilePage implements OnInit {
@@ -67,34 +39,36 @@ export class ProfilePage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    const uid = this.authService.getCurrentUserUid();
-    const email = this.authService.getCurrentUserEmail();
+    await this.userService.createUserIfNotExists();
 
-    if (uid && email) {
-      // Kreiraj dokument u Firestore ako ne postoji
-      await this.userService.createUserIfNotExists(uid, email);
+    this.userService.getUserData().subscribe(async (user: User | null) => {
+      if (!user) return;
+      this.currentUser = user;
 
-      // Učitaj podatke korisnika
-      this.userService.getUserData(uid).subscribe(user => {
-        this.currentUser = user;
-        this.watchLaterMovies = [];
-        this.seenMovies = [];
-        this.mapMovies(user.watchLater, 'watchLater');
-        this.mapMovies(user.seen, 'seen');
-      });
-    }
+      // Čišćenje starih podataka
+      this.watchLaterMovies = [];
+      this.seenMovies = [];
+
+      // Dobavi filmove
+      const watchLaterIds = user.watchLater ? Object.keys(user.watchLater) : [];
+      const seenIds = user.seen ? Object.keys(user.seen) : [];
+
+      this.loadMovies(watchLaterIds, 'watchLater');
+      this.loadMovies(seenIds, 'seen');
+    });
   }
 
-  mapMovies(movieIds: string[], listType: 'watchLater' | 'seen') {
-    movieIds.forEach(id => {
+  private loadMovies(ids: string[], type: 'watchLater' | 'seen') {
+    ids.forEach(id => {
       this.movieService.getMovie(id).subscribe(movie => {
-        if (movie) {
-          if (listType === 'watchLater' && !this.watchLaterMovies.find(m => m.id === movie.id)) {
-            this.watchLaterMovies.push(movie);
-          }
-          if (listType === 'seen' && !this.seenMovies.find(m => m.id === movie.id)) {
-            this.seenMovies.push(movie);
-          }
+        if (!movie) return;
+
+        if (type === 'watchLater' && !this.watchLaterMovies.find(m => m.id === movie.id)) {
+          this.watchLaterMovies.push(movie);
+        }
+
+        if (type === 'seen' && !this.seenMovies.find(m => m.id === movie.id)) {
+          this.seenMovies.push(movie);
         }
       });
     });
@@ -110,18 +84,16 @@ export class ProfilePage implements OnInit {
 
   removeFromWatchLater(movieId: string) {
     if (!this.currentUser) return;
-    this.userService.removeFromWatchLater(this.currentUser.uid, movieId)
-      .then(() => {
-        this.watchLaterMovies = this.watchLaterMovies.filter(m => m.id !== movieId);
-      });
+    this.userService.removeFromWatchLater(movieId).then(() => {
+      this.watchLaterMovies = this.watchLaterMovies.filter(m => m.id !== movieId);
+    });
   }
 
   removeFromSeen(movieId: string) {
     if (!this.currentUser) return;
-    this.userService.removeFromSeen(this.currentUser.uid, movieId)
-      .then(() => {
-        this.seenMovies = this.seenMovies.filter(m => m.id !== movieId);
-      });
+    this.userService.removeFromSeen(movieId).then(() => {
+      this.seenMovies = this.seenMovies.filter(m => m.id !== movieId);
+    });
   }
 
   setWatchLaterFilter(filter: 'movie' | 'series') {
@@ -149,7 +121,6 @@ export class ProfilePage implements OnInit {
   }
 
   goBack() {
-  this.router.navigate(['/movies']); // vraća na stranicu sa svim filmovima
-}
-
+    this.router.navigate(['/movies']);
+  }
 }

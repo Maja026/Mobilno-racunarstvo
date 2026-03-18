@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, setDoc, query, where, getDocs, Timestamp } from '@angular/fire/firestore';
+import { Database, ref, set, get } from '@angular/fire/database';
 
 export interface Rating {
   movieId: string;
@@ -13,21 +13,37 @@ export interface Rating {
   providedIn: 'root'
 })
 export class RatingService {
-  constructor(private firestore: Firestore) {}
+
+  constructor(private db: Database) {}
 
   // Dodavanje ili izmena ocene
   addRating(rating: Rating) {
-    const docRef = doc(this.firestore, `ratings/${rating.userId}_${rating.movieId}`);
-    return setDoc(docRef, {
+    const ratingRef = ref(this.db, 'ratings/' + rating.userId + '_' + rating.movieId);
+
+    return set(ratingRef, {
       ...rating,
-      timestamp: Timestamp.now()  // automatsko vreme Firestore
+      timestamp: Date.now()
     });
   }
 
   // Dohvati sve ocene za jedan film
   async getRatingsForMovie(movieId: string): Promise<Rating[]> {
-    const q = query(collection(this.firestore, 'ratings'), where('movieId', '==', movieId));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => doc.data() as Rating);
+
+    const ratingsRef = ref(this.db, 'ratings');
+    const snapshot = await get(ratingsRef);
+
+    if (!snapshot.exists()) return [];
+
+    const data = snapshot.val();
+    const ratings: Rating[] = [];
+
+    Object.values(data).forEach((rating: any) => {
+      if (rating.movieId === movieId) {
+        ratings.push(rating);
+      }
+    });
+
+    return ratings;
   }
+
 }

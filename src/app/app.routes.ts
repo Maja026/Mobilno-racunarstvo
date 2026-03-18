@@ -19,10 +19,11 @@ export const routes: Routes = [
       import('./home/home.page').then((m) => m.HomePage),
   },
   {
-    path: 'movies',
-    loadComponent: () =>
-      import('./pages/movies/movies.page').then((m) => m.MoviesPage),
-  },
+  path: 'movies',
+  loadComponent: () =>
+    import('./pages/movies/movies.page').then((m) => m.MoviesPage) // ovo je OK ako MoviesPage postoji
+}
+,
   {
     path: 'movie-details/:id',
     loadComponent: () =>

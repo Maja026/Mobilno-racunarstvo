@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideDatabase, getDatabase } from '@angular/fire/database';
 import { importProvidersFrom } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -15,20 +15,16 @@ import { environment } from './environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes),
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
 
-    // Firebase App
+    // Firebase modular setup
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-
-    // Firebase Auth
     provideAuth(() => getAuth()),
+    provideDatabase(() => getDatabase()),
 
-    // Firestore
-    provideFirestore(() => getFirestore()),
-
-    // Angular moduli
+    // Angular providers za forme i common module
     importProvidersFrom(CommonModule, FormsModule, ReactiveFormsModule)
   ]
 });
