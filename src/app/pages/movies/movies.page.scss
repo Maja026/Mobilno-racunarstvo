@@ -18,12 +18,12 @@
   gap: 5px;
 }
 .description {
-  display: -webkit-box;           /* koristi fleksibilnu kutiju za webkit */
-  -webkit-line-clamp: 2;          /* broj redova koji će se prikazati */
-  -webkit-box-orient: vertical;   /* vertikalna orijentacija za kutiju */
-  overflow: hidden;               /* sakriva višak teksta */
-  text-overflow: ellipsis;        /* dodaje "..." na kraju */
-  white-space: normal;            /* dozvoljava višeredni tekst */
+  display: -webkit-box; 
+  -webkit-line-clamp: 2;          
+  -webkit-box-orient: vertical;   
+  overflow: hidden;               
+  text-overflow: ellipsis;        
+  white-space: normal;            
 }
 ion-searchbar {
   margin: 10px 0;

@@ -21,7 +21,7 @@ export const routes: Routes = [
   {
   path: 'movies',
   loadComponent: () =>
-    import('./pages/movies/movies.page').then((m) => m.MoviesPage) // ovo je OK ako MoviesPage postoji
+    import('./pages/movies/movies.page').then((m) => m.MoviesPage)
 }
 ,
   {
@@ -39,7 +39,7 @@ export const routes: Routes = [
   {
   path: 'profile',
   loadComponent: () =>
-    import('./pages/profile/profile.page').then((m) => m.ProfilePage) // standalone component
+    import('./pages/profile/profile.page').then((m) => m.ProfilePage)
 },
 
 

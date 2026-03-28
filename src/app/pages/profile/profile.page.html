@@ -1,7 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <!-- Dugme za povratak -->
       <ion-button (click)="goBack()">
         Go Back
       </ion-button>
@@ -31,7 +30,6 @@
       <ion-label>
         <h2>{{ movie.title }}</h2>
         <p *ngIf="movie.type">Type: {{ movie.type }}</p>
-        <!-- Skraćeni opis -->
         <p *ngIf="movie.description" class="short-description">
           {{ movie.description }}
         </p>
@@ -54,7 +52,6 @@
       <ion-label>
         <h2>{{ movie.title }}</h2>
         <p *ngIf="movie.type">Type: {{ movie.type }}</p>
-        <!-- Skraćeni opis -->
         <p *ngIf="movie.description" class="short-description">
           {{ movie.description }}
         </p>

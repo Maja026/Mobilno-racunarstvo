@@ -61,7 +61,8 @@ export class RatingModalPage {
       comment: this.comment
     };
 
-    await this.ratingService.addRating(newRating); // sada ide u Firestore
+    await this.ratingService.addRating(newRating); 
+    
     this.modalCtrl.dismiss();
   }
 

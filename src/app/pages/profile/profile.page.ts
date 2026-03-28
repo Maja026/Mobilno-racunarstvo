@@ -19,7 +19,7 @@ import { RatingModalPage } from '../rating/rating-modal.page';
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule, // <-- ovo sadrži sve Ionic komponente i providere
+    IonicModule, 
   ]
 })
 export class ProfilePage implements OnInit {
@@ -45,11 +45,9 @@ export class ProfilePage implements OnInit {
       if (!user) return;
       this.currentUser = user;
 
-      // Čišćenje starih podataka
       this.watchLaterMovies = [];
       this.seenMovies = [];
 
-      // Dobavi filmove
       const watchLaterIds = user.watchLater ? Object.keys(user.watchLater) : [];
       const seenIds = user.seen ? Object.keys(user.seen) : [];
 

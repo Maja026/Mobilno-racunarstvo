@@ -11,7 +11,7 @@ export class MovieService {
 
   constructor(private db: Database) {}
 
-  // Vrati sve filmove sa ID-jem
+  
   getMovies(): Observable<Movie[]> {
     const moviesRef = ref(this.db, 'movies');
 
@@ -30,7 +30,7 @@ export class MovieService {
     );
   }
 
-  // Vrati jedan film po ID-u
+  
   getMovie(id: string): Observable<Movie> {
     const movieRef = ref(this.db, `movies/${id}`);
     return objectVal<Omit<Movie, 'id'>>(movieRef).pipe(

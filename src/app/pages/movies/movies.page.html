@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <!-- Search bar -->
+
     <ion-searchbar
       placeholder="Search movies/series"
       [(ngModel)]="searchTerm"
@@ -21,7 +21,7 @@
 
 <ion-content>
 
-  <!-- Segment dugmad za filter -->
+
   <ion-segment [(ngModel)]="filter" (ionChange)="applyFilter()" class="segment-filter">
     <ion-segment-button value="movie">Movies</ion-segment-button>
     <ion-segment-button value="series">Series</ion-segment-button>

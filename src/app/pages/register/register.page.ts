@@ -40,11 +40,11 @@ export class RegisterPage {
     this.authService.register(this.email, this.password)
       .then(() => {
         console.log('User registered');
-        this.router.navigate(['/movies']); // ide na movies stranicu posle registracije
+        this.router.navigate(['/movies']);
       })
       .catch((err) => {
         console.error(err);
-        alert(err.message); // prikaz greške
+        alert(err.message);
       });
   }
 

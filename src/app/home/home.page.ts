@@ -13,12 +13,11 @@ import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent } fr
 export class HomePage {
   constructor(private router: Router, private authService: AuthService) {}
 
-  // Logout metoda
   logout() {
     this.authService.logout()
       .then(() => {
         console.log('User logged out');
-        this.router.navigate(['/login']); // vraća na login stranicu
+        this.router.navigate(['/login']); 
       })
       .catch((err: any) => {
         console.error(err);

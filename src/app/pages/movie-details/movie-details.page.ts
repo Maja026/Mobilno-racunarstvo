@@ -34,7 +34,6 @@ export class MovieDetailsPage implements OnInit {
         this.movie = data;
       });
 
-      // Učitaj sve ocene za film
       this.ratingService.getRatingsForMovie(id).then(ratings => {
         this.ratings = ratings;
 
@@ -48,6 +47,6 @@ export class MovieDetailsPage implements OnInit {
   }
 
   goBack() {
-    this.location.back(); // vraća korisnika na prethodnu stranicu
+    this.location.back();
   }
 }

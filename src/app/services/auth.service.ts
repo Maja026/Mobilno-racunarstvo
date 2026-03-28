@@ -13,7 +13,7 @@ export class AuthService {
     private db: Database
   ) {}
 
-  // LOGIN korisnika
+  
   login(email: string, password: string): Promise<void> {
     return signInWithEmailAndPassword(this.auth, email, password)
       .then(() => {
@@ -25,13 +25,13 @@ export class AuthService {
       });
   }
 
-  // REGISTRACIJA korisnika + kreiranje u Realtime DB
+  
   register(email: string, password: string): Promise<void> {
     return createUserWithEmailAndPassword(this.auth, email, password)
       .then(userCredential => {
         const uid = userCredential.user.uid;
 
-        // Kreiraj korisnika u Realtime DB
+        
         return set(ref(this.db, `users/${uid}`), {
           uid,
           email,
@@ -40,7 +40,7 @@ export class AuthService {
         });
       })
       .then(() => {
-        console.log('User registered and created in DB');
+        console.log('User registered and created in database');
       })
       .catch(err => {
         console.error('Registration error:', err);
@@ -48,7 +48,6 @@ export class AuthService {
       });
   }
 
-  // LOGOUT korisnika
   logout(): Promise<void> {
     return signOut(this.auth)
       .then(() => console.log('User logged out'))
@@ -58,17 +57,14 @@ export class AuthService {
       });
   }
 
-  // UID trenutnog korisnika
   getCurrentUserUid(): string | null {
     return this.auth.currentUser ? this.auth.currentUser.uid : null;
   }
 
-  // Email trenutnog korisnika
   getCurrentUserEmail(): string | null {
     return this.auth.currentUser ? this.auth.currentUser.email : null;
   }
 
-  // Observable trenutnog korisnika
   getCurrentUser(): Observable<FirebaseUser | null> {
     return of(this.auth.currentUser);
   }

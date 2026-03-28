@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service'; // <-- obavezno import
+import { AuthService } from '../../services/auth.service';
 import {
   IonHeader,
   IonToolbar,
@@ -34,16 +34,15 @@ export class LoginPage {
   email: string = '';
   password: string = '';
 
-  // <-- ubaci authService u konstruktor
   constructor(private router: Router, private authService: AuthService) {}
 
   login() {
     this.authService.login(this.email, this.password)
       .then(() => {
         console.log('User logged in');
-        this.router.navigate(['/movies']); // ide na movies stranicu posle login-a
+        this.router.navigate(['/movies']);
       })
-      .catch((err: any) => { // <-- TS ne voli implicit any
+      .catch((err: any) => {
         console.error(err);
         alert(err.message);
       });

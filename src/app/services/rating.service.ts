@@ -16,7 +16,6 @@ export class RatingService {
 
   constructor(private db: Database) {}
 
-  // Dodavanje ili izmena ocene
   addRating(rating: Rating) {
     const ratingRef = ref(this.db, 'ratings/' + rating.userId + '_' + rating.movieId);
 
@@ -26,7 +25,6 @@ export class RatingService {
     });
   }
 
-  // Dohvati sve ocene za jedan film
   async getRatingsForMovie(movieId: string): Promise<Rating[]> {
 
     const ratingsRef = ref(this.db, 'ratings');

@@ -19,12 +19,12 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
 
-    // Firebase modular setup
+    
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideDatabase(() => getDatabase()),
 
-    // Angular providers za forme i common module
+    
     importProvidersFrom(CommonModule, FormsModule, ReactiveFormsModule)
   ]
 });
