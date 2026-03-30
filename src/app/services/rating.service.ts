@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, set, get } from '@angular/fire/database';
+import { FirebaseHttpService } from './firebase-http.service';
 
 export interface Rating {
   movieId: string;
   userId: string;
   rating: number;
   comment: string;
-  timestamp?: any;
+  timestamp?: number;
 }
 
 @Injectable({
@@ -14,34 +14,38 @@ export interface Rating {
 })
 export class RatingService {
 
-  constructor(private db: Database) {}
+  constructor(private http: FirebaseHttpService) {}
 
-  addRating(rating: Rating) {
-    const ratingRef = ref(this.db, 'ratings/' + rating.userId + '_' + rating.movieId);
 
-    return set(ratingRef, {
+  async addRating(rating: Rating): Promise<void> {
+    const ratingId = `${rating.userId}_${rating.movieId}`;
+    await this.http.put(`ratings/${ratingId}`, {
       ...rating,
       timestamp: Date.now()
     });
   }
 
+
   async getRatingsForMovie(movieId: string): Promise<Rating[]> {
+    const data = await this.http.get('ratings');
+    if (!data) return [];
 
-    const ratingsRef = ref(this.db, 'ratings');
-    const snapshot = await get(ratingsRef);
-
-    if (!snapshot.exists()) return [];
-
-    const data = snapshot.val();
+    const ratingsObj: { [key: string]: any } = data;
     const ratings: Rating[] = [];
 
-    Object.values(data).forEach((rating: any) => {
-      if (rating.movieId === movieId) {
-        ratings.push(rating);
+    Object.keys(ratingsObj).forEach(key => {
+      const r = ratingsObj[key];
+      if (r.movieId === movieId) {
+        ratings.push({
+          movieId: r.movieId,
+          userId: r.userId,
+          rating: r.rating,
+          comment: r.comment,
+          timestamp: r.timestamp || 0
+        });
       }
     });
 
     return ratings;
   }
-
 }

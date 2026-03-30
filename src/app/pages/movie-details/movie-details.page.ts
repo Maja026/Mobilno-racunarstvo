@@ -6,7 +6,6 @@ import { MovieService } from '../../services/movie.service';
 import { RatingService, Rating } from '../../services/rating.service';
 import { Movie } from '../../services/movie.model';
 import { Location } from '@angular/common';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-movie-details',
@@ -27,24 +26,28 @@ export class MovieDetailsPage implements OnInit {
     private location: Location
   ) {}
 
-  ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.movieService.getMovie(id).subscribe(data => {
-        this.movie = data;
-      });
 
-      this.ratingService.getRatingsForMovie(id).then(ratings => {
-        this.ratings = ratings;
 
-        if (ratings.length > 0) {
-          this.averageRating = ratings
-            .map(r => r.rating)
-            .reduce((a, b) => a + b, 0) / ratings.length;
-        }
-      });
+async ngOnInit() {
+  const id = this.route.snapshot.paramMap.get('id');
+  if (!id) return;
+
+  const movie = await this.movieService.getMovie(id);
+  if (movie) {
+    this.movie = movie;
+  }
+
+  const ratings = await this.ratingService.getRatingsForMovie(id);
+  if (ratings) {
+    this.ratings = ratings;
+    if (ratings.length > 0) {
+      this.averageRating = ratings
+        .map(r => r.rating)
+        .reduce((a, b) => a + b, 0) / ratings.length;
     }
   }
+}
+
 
   goBack() {
     this.location.back();

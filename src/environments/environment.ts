@@ -2,14 +2,14 @@ export const environment = {
   production: false,
 
   firebaseConfig: {
-    apiKey: "AIzaSyB_-UzG-wTbaXrXiEFmV6txh7nY6s-SaSo",
-    authDomain: "movie-rating-app-maja.firebaseapp.com",
-    projectId: "movie-rating-app-maja",
-    storageBucket: "movie-rating-app-maja.firebasestorage.app",
-    messagingSenderId: "507618418693",
-    appId: "1:507618418693:web:5fcadd35f893b6304abc6c",
-    measurementId: "G-9GLD9SRC48",
-    databaseURL: "https://movie-rating-app-maja-default-rtdb.firebaseio.com"
+    apiKey: "AIzaSyAoLmPiE2Nt4R_gfB7lvGQV1I2x8MjAZ9E",
+    authDomain: "mobilno-racunarstvo-maja.firebaseapp.com",
+    projectId: "mobilno-racunarstvo-maja",
+    storageBucket: "mobilno-racunarstvo-maja.firebasestorage.app",
+    messagingSenderId: "1077091306196",
+    appId: "1:1077091306196:web:2334c314f12787f2cbc941",
+    measurementId: "G-VRS9C56WM7",
+    databaseURL: "https://mobilno-racunarstvo-maja-default-rtdb.firebaseio.com"
   }
 
 };

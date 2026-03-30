@@ -1,48 +1,67 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, objectVal, listVal } from '@angular/fire/database';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Movie } from './movie.model';
+import { FirebaseHttpService } from './firebase-http.service';
+
+export interface Movie {
+  id: string;
+  title: string;
+  type: string;
+  description?: string;
+  imageURL?: string;
+  director?: string;
+  year?: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class MovieService {
 
-  constructor(private db: Database) {}
+  constructor(private http: FirebaseHttpService) {}
 
-  
-  getMovies(): Observable<Movie[]> {
-    const moviesRef = ref(this.db, 'movies');
+  async getMovies(): Promise<Movie[]> {
+    const data = await this.http.get('movies'); 
+    if (!data) return [];
 
-    return listVal<Omit<Movie, 'id'>>(moviesRef, { keyField: 'id' }).pipe(
-      map((moviesArray) =>
-        moviesArray.map(movie => ({
-          id: (movie as any).id,
-          title: movie.title,
-          type: movie.type,
-          description: movie.description || '',
-          imageURL: movie.imageURL || '',
-          director: movie.director || '',
-          year: movie.year || 0
-        }))
-      )
-    );
+    const moviesObj: { [key: string]: any } = data;
+
+    return Object.keys(moviesObj).map(key => ({
+      id: key,
+      title: moviesObj[key].title,
+      type: moviesObj[key].type,
+      description: moviesObj[key].description || '',
+      imageURL: moviesObj[key].imageURL || '',
+      director: moviesObj[key].director || '',
+      year: moviesObj[key].year || 0
+    }));
   }
 
-  
-  getMovie(id: string): Observable<Movie> {
-    const movieRef = ref(this.db, `movies/${id}`);
-    return objectVal<Omit<Movie, 'id'>>(movieRef).pipe(
-      map(movie => ({
-        id,
-        title: movie?.title || '',
-        type: movie?.type || 'movie',
-        description: movie?.description || '',
-        imageURL: movie?.imageURL || '',
-        director: movie?.director || '',
-        year: movie?.year || 0
-      }))
-    );
+  async getMovie(id: string): Promise<Movie | null> {
+    const movieData = await this.http.get(`movies/${id}`); 
+    if (!movieData) return null;
+
+    const movieObj: any = movieData;
+
+    return {
+      id,
+      title: movieObj.title,
+      type: movieObj.type,
+      description: movieObj.description || '',
+      imageURL: movieObj.imageURL || '',
+      director: movieObj.director || '',
+      year: movieObj.year || 0
+    };
+  }
+
+  async addMovie(movie: Omit<Movie, 'id'>): Promise<string> {
+    const newId = await this.http.post('movies', movie); 
+    return newId;
+  }
+
+  async updateMovie(id: string, movie: Partial<Omit<Movie, 'id'>>): Promise<void> {
+    await this.http.put(`movies/${id}`, movie);
+  }
+
+  async deleteMovie(id: string): Promise<void> {
+    await this.http.delete(`movies/${id}`);
   }
 }

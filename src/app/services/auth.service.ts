@@ -1,71 +1,44 @@
 import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, User as FirebaseUser } from '@angular/fire/auth';
-import { Database, ref, set } from '@angular/fire/database';
-import { Observable, of } from 'rxjs';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { FirebaseHttpService } from './firebase-http.service';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
 
   constructor(
     private auth: Auth,
-    private db: Database
+    private http: FirebaseHttpService
   ) {}
 
-  
-  login(email: string, password: string): Promise<void> {
-    return signInWithEmailAndPassword(this.auth, email, password)
-      .then(() => {
-        console.log('User logged in:', this.auth.currentUser?.email);
-      })
-      .catch(err => {
-        console.error('Login error:', err);
-        throw err;
-      });
+  async register(email: string, password: string): Promise<void> {
+    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+    const user = userCredential.user;
+
+    await this.http.put(`users/${user.uid}`, {
+      uid: user.uid,
+      email: user.email,
+      watchLater: {},
+      seen: {}
+    });
   }
 
-  
-  register(email: string, password: string): Promise<void> {
-    return createUserWithEmailAndPassword(this.auth, email, password)
-      .then(userCredential => {
-        const uid = userCredential.user.uid;
-
-        
-        return set(ref(this.db, `users/${uid}`), {
-          uid,
-          email,
-          watchLater: {},
-          seen: {}
-        });
-      })
-      .then(() => {
-        console.log('User registered and created in database');
-      })
-      .catch(err => {
-        console.error('Registration error:', err);
-        throw err;
-      });
+  async login(email: string, password: string): Promise<void> {
+    await signInWithEmailAndPassword(this.auth, email, password);
   }
 
-  logout(): Promise<void> {
-    return signOut(this.auth)
-      .then(() => console.log('User logged out'))
-      .catch(err => {
-        console.error('Logout error:', err);
-        throw err;
-      });
+  async logout(): Promise<void> {
+    await signOut(this.auth);
   }
 
-  getCurrentUserUid(): string | null {
-    return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  async getCurrentUserUid(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.uid : null;
   }
 
-  getCurrentUserEmail(): string | null {
-    return this.auth.currentUser ? this.auth.currentUser.email : null;
-  }
-
-  getCurrentUser(): Observable<FirebaseUser | null> {
-    return of(this.auth.currentUser);
+  async getCurrentUserEmail(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.email : null;
   }
 }

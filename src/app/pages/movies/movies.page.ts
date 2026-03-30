@@ -39,7 +39,7 @@ import { User } from '../../services/user.model';
 export class MoviesPage implements OnInit {
   movies: Movie[] = [];
   filteredMovies: Movie[] = [];
-  currentUser: User | null = null;
+  currentUser: User | null = null; 
   filter: 'movie' | 'series' = 'movie';
   searchTerm: string = '';
 
@@ -50,25 +50,29 @@ export class MoviesPage implements OnInit {
     private userService: UserService
   ) {}
 
-  ngOnInit() {
-    this.loadMovies();
-    this.loadCurrentUser();
+  async ngOnInit() {
+    await this.loadCurrentUser();
+    await this.loadMovies();
   }
 
-  private loadMovies() {
-    this.movieService.getMovies().subscribe({
-      next: data => {
-        this.movies = data;
-        this.applyFilter();
-      },
-      error: err => console.error('Error loading movies:', err)
-    });
+  private async loadMovies() {
+    try {
+      this.movies = await this.movieService.getMovies();
+      this.applyFilter();
+    } catch (err) {
+      console.error('Error loading movies:', err);
+    }
   }
 
-  private loadCurrentUser() {
-    this.userService.getUserData().subscribe(user => {
-      this.currentUser = user;
-    });
+  private async loadCurrentUser() {
+    try {
+      const uid = await this.authService.getCurrentUserUid();
+      if (!uid) return;
+
+      this.currentUser = await this.userService.getUserData(uid);
+    } catch (err) {
+      console.error('Error loading user:', err);
+    }
   }
 
   applyFilter() {
@@ -91,30 +95,42 @@ export class MoviesPage implements OnInit {
     this.authService.logout().then(() => this.router.navigate(['/login']));
   }
 
-  addToWatchLater(movieId: string) {
-    if (!this.currentUser) return;
+  async addToWatchLater(movieId: string) {
+    if (!this.currentUser || !this.currentUser.uid) return;
 
     const exists = !!this.currentUser.watchLater?.[movieId];
-    const action = exists ? this.userService.removeFromWatchLater(movieId) : this.userService.addToWatchLater(movieId);
 
-    action.then(() => {
-      if (!this.currentUser) return;
-      if (!this.currentUser.watchLater) this.currentUser.watchLater = {};
-      exists ? delete this.currentUser.watchLater[movieId] : this.currentUser.watchLater[movieId] = true;
-    }).catch(err => console.error(err));
+    try {
+      if (exists) {
+        await this.userService.removeFromWatchLater(this.currentUser.uid, movieId);
+        delete this.currentUser.watchLater[movieId];
+      } else {
+        await this.userService.addToWatchLater(this.currentUser.uid, movieId);
+        if (!this.currentUser.watchLater) this.currentUser.watchLater = {};
+        this.currentUser.watchLater[movieId] = true;
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  markAsSeen(movieId: string) {
-    if (!this.currentUser) return;
+  async markAsSeen(movieId: string) {
+    if (!this.currentUser || !this.currentUser.uid) return;
 
     const exists = !!this.currentUser.seen?.[movieId];
-    const action = exists ? this.userService.removeFromSeen(movieId) : this.userService.markAsSeen(movieId);
 
-    action.then(() => {
-      if (!this.currentUser) return;
-      if (!this.currentUser.seen) this.currentUser.seen = {};
-      exists ? delete this.currentUser.seen[movieId] : this.currentUser.seen[movieId] = true;
-    }).catch(err => console.error(err));
+    try {
+      if (exists) {
+        await this.userService.removeFromSeen(this.currentUser.uid, movieId);
+        delete this.currentUser.seen[movieId];
+      } else {
+        await this.userService.markAsSeen(this.currentUser.uid, movieId);
+        if (!this.currentUser.seen) this.currentUser.seen = {};
+        this.currentUser.seen[movieId] = true;
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   goToDetails(movieId: string) {

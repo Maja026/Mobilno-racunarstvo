@@ -50,21 +50,22 @@ export class RatingModalPage {
     private authService: AuthService
   ) {}
 
-  async submitRating() {
-    const userId = this.authService.getCurrentUserUid();
-    if (!userId || !this.movie) return;
+async submitRating() {
+  const userId = await this.authService.getCurrentUserUid();
+  if (!userId || !this.movie || !this.movie.id) return;
 
-    const newRating: Rating = {
-      userId,
-      movieId: this.movie.id!,
-      rating: this.ratingValue,
-      comment: this.comment
-    };
+  const newRating: Rating = {
+    userId,
+    movieId: this.movie.id, 
+    rating: this.ratingValue,
+    comment: this.comment
+  };
 
-    await this.ratingService.addRating(newRating); 
-    
-    this.modalCtrl.dismiss();
-  }
+  await this.ratingService.addRating(newRating); 
+  this.modalCtrl.dismiss();
+}
+
+
 
   close() {
     this.modalCtrl.dismiss();

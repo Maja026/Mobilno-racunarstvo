@@ -16,11 +16,7 @@ import { RatingModalPage } from '../rating/rating-modal.page';
   standalone: true,
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule, 
-  ]
+  imports: [CommonModule, FormsModule, IonicModule],
 })
 export class ProfilePage implements OnInit {
   currentUser: User | null = null;
@@ -39,60 +35,62 @@ export class ProfilePage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await this.userService.createUserIfNotExists();
+    const uid = await this.authService.getCurrentUserUid();
+    const email = await this.authService.getCurrentUserEmail();
+    if (!uid || !email) return;
 
-    this.userService.getUserData().subscribe(async (user: User | null) => {
-      if (!user) return;
-      this.currentUser = user;
+    
+    await this.userService.createUserIfNotExists(uid, email);
 
-      this.watchLaterMovies = [];
-      this.seenMovies = [];
+    
+    const user = await this.userService.getUserData(uid);
+    if (!user) return;
 
-      const watchLaterIds = user.watchLater ? Object.keys(user.watchLater) : [];
-      const seenIds = user.seen ? Object.keys(user.seen) : [];
+    this.currentUser = user;
 
-      this.loadMovies(watchLaterIds, 'watchLater');
-      this.loadMovies(seenIds, 'seen');
-    });
+    const watchLaterIds = user.watchLater ? Object.keys(user.watchLater) : [];
+    const seenIds = user.seen ? Object.keys(user.seen) : [];
+
+    await this.loadMovies(watchLaterIds, 'watchLater');
+    await this.loadMovies(seenIds, 'seen');
   }
 
-  private loadMovies(ids: string[], type: 'watchLater' | 'seen') {
-    ids.forEach(id => {
-      this.movieService.getMovie(id).subscribe(movie => {
-        if (!movie) return;
+  private async loadMovies(ids: string[], type: 'watchLater' | 'seen') {
+    for (const id of ids) {
+      const movie = await this.movieService.getMovie(id);
+      if (!movie) continue;
 
-        if (type === 'watchLater' && !this.watchLaterMovies.find(m => m.id === movie.id)) {
-          this.watchLaterMovies.push(movie);
-        }
+      if (type === 'watchLater' && !this.watchLaterMovies.find(m => m.id === movie.id)) {
+        this.watchLaterMovies.push(movie);
+      }
 
-        if (type === 'seen' && !this.seenMovies.find(m => m.id === movie.id)) {
-          this.seenMovies.push(movie);
-        }
-      });
-    });
+      if (type === 'seen' && !this.seenMovies.find(m => m.id === movie.id)) {
+        this.seenMovies.push(movie);
+      }
+    }
   }
 
   goToDetails(movieId: string) {
     this.router.navigate(['/movie-details', movieId]);
   }
 
-  logout() {
-    this.authService.logout().then(() => this.router.navigate(['/login']));
+  async logout() {
+    await this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
-  removeFromWatchLater(movieId: string) {
-    if (!this.currentUser) return;
-    this.userService.removeFromWatchLater(movieId).then(() => {
-      this.watchLaterMovies = this.watchLaterMovies.filter(m => m.id !== movieId);
-    });
-  }
+async removeFromWatchLater(movieId: string) {
+  if (!this.currentUser || !this.currentUser.uid) return; 
+  await this.userService.removeFromWatchLater(this.currentUser.uid, movieId);
+  this.watchLaterMovies = this.watchLaterMovies.filter(m => m.id !== movieId);
+}
 
-  removeFromSeen(movieId: string) {
-    if (!this.currentUser) return;
-    this.userService.removeFromSeen(movieId).then(() => {
-      this.seenMovies = this.seenMovies.filter(m => m.id !== movieId);
-    });
-  }
+async removeFromSeen(movieId: string) {
+  if (!this.currentUser || !this.currentUser.uid) return; 
+  await this.userService.removeFromSeen(this.currentUser.uid, movieId);
+  this.seenMovies = this.seenMovies.filter(m => m.id !== movieId);
+}
+
 
   setWatchLaterFilter(filter: 'movie' | 'series') {
     this.watchLaterFilter = filter;
