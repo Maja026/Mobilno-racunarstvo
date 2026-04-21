@@ -1,64 +1,47 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, get, set } from '@angular/fire/database';
+import { FirebaseHttpService } from './firebase-http.service';
 import { User } from './user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  constructor(private db: Database) {}
+
+  constructor(private http: FirebaseHttpService) {}
 
   async createUserIfNotExists(uid: string, email: string): Promise<void> {
-    const userRef = ref(this.db, `users/${uid}`);
-    const snapshot = await get(userRef);
+    const user = await this.http.get(`users/${uid}`);
 
-    if (!snapshot.exists()) {
+    if (!user) {
       const newUser: User = {
         uid,
         email,
         watchLater: {},
         seen: {}
       };
-      await set(userRef, newUser);
+
+      await this.http.put(`users/${uid}`, newUser);
     }
   }
-
 
   async getUserData(uid: string): Promise<User | null> {
-    try {
-      const userRef = ref(this.db, `users/${uid}`);
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-        return snapshot.val() as User;
-      }
-      return null;
-    } catch (err) {
-      console.error('Error fetching user data:', err);
-      return null;
-    }
+    const user = await this.http.get(`users/${uid}`);
+    return user ? (user as User) : null;
   }
-
 
   async addToWatchLater(uid: string, movieId: string): Promise<void> {
-    const movieRef = ref(this.db, `users/${uid}/watchLater/${movieId}`);
-    await set(movieRef, true);
+    await this.http.put(`users/${uid}/watchLater/${movieId}`, true);
   }
-
 
   async removeFromWatchLater(uid: string, movieId: string): Promise<void> {
-    const movieRef = ref(this.db, `users/${uid}/watchLater/${movieId}`);
-    await set(movieRef, null);
+    await this.http.delete(`users/${uid}/watchLater/${movieId}`);
   }
-
 
   async markAsSeen(uid: string, movieId: string): Promise<void> {
-    const movieRef = ref(this.db, `users/${uid}/seen/${movieId}`);
-    await set(movieRef, true);
+    await this.http.put(`users/${uid}/seen/${movieId}`, true);
   }
 
-
   async removeFromSeen(uid: string, movieId: string): Promise<void> {
-    const movieRef = ref(this.db, `users/${uid}/seen/${movieId}`);
-    await set(movieRef, null);
+    await this.http.delete(`users/${uid}/seen/${movieId}`);
   }
 }
