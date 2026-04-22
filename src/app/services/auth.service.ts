@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { FirebaseHttpService } from './firebase-http.service';
 
 @Injectable({
@@ -7,38 +6,60 @@ import { FirebaseHttpService } from './firebase-http.service';
 })
 export class AuthService {
 
-  constructor(
-    private auth: Auth,
-    private http: FirebaseHttpService
-  ) {}
+  private API_KEY = "AIzaSyAoLmPiE2Nt4R_gfB7lvGQV1I2x8MjAZ9E";
+
+  constructor(private http: FirebaseHttpService) {}
 
   async register(email: string, password: string): Promise<void> {
-    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-    const user = userCredential.user;
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${this.API_KEY}`;
 
-    await this.http.put(`users/${user.uid}`, {
-      uid: user.uid,
-      email: user.email,
+    const response: any = await this.http.postFullUrl(url, {
+      email,
+      password,
+      returnSecureToken: true
+    });
+
+    const uid = response.localId;
+
+
+    await this.http.put(`users/${uid}`, {
+      uid,
+      email,
       watchLater: {},
       seen: {}
     });
+
+
+    localStorage.setItem('token', response.idToken);
+    localStorage.setItem('uid', uid);
+    localStorage.setItem('email', email);
   }
 
   async login(email: string, password: string): Promise<void> {
-    await signInWithEmailAndPassword(this.auth, email, password);
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this.API_KEY}`;
+
+    const response: any = await this.http.postFullUrl(url, {
+      email,
+      password,
+      returnSecureToken: true
+    });
+
+    localStorage.setItem('token', response.idToken);
+    localStorage.setItem('uid', response.localId);
+    localStorage.setItem('email', email);
   }
 
   async logout(): Promise<void> {
-    await signOut(this.auth);
+    localStorage.removeItem('token');
+    localStorage.removeItem('uid');
+    localStorage.removeItem('email');
   }
 
   async getCurrentUserUid(): Promise<string | null> {
-    const user = this.auth.currentUser;
-    return user ? user.uid : null;
+    return localStorage.getItem('uid');
   }
 
   async getCurrentUserEmail(): Promise<string | null> {
-    const user = this.auth.currentUser;
-    return user ? user.email : null;
+    return localStorage.getItem('email');
   }
 }

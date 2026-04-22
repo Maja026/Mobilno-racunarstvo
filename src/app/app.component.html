@@ -1,3 +1,41 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+
+  <ion-menu contentId="main-content" type="overlay">
+
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menu</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+
+      <ion-list>
+
+        <ion-item button (click)="navigate('/movies')">
+          Movies
+        </ion-item>
+
+        <ion-item button (click)="navigate('/profile')">
+          Profile
+        </ion-item>
+
+        <ion-item button (click)="navigate('/ratings-edit')">
+          My Ratings
+        </ion-item>
+
+        <ion-item button (click)="logout()">
+          Logout
+        </ion-item>
+
+      </ion-list>
+
+    </ion-content>
+
+  </ion-menu>
+
+  <div class="ion-page" id="main-content">
+    <ion-router-outlet></ion-router-outlet>
+  </div>
+
 </ion-app>

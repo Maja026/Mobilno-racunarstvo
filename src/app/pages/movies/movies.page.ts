@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { 
   IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, 
-  IonList, IonItem, IonLabel, IonThumbnail, IonSegment, IonSegmentButton, IonSearchbar 
+  IonList, IonItem, IonLabel, IonThumbnail, IonSegment, IonSegmentButton, IonSearchbar, IonMenuButton 
 } from '@ionic/angular/standalone';
 
 import { AuthService } from '../../services/auth.service';
@@ -33,7 +33,8 @@ import { User } from '../../services/user.model';
     IonThumbnail,
     IonSegment,
     IonSegmentButton,
-    IonSearchbar
+    IonSearchbar,
+    IonMenuButton
   ],
 })
 export class MoviesPage implements OnInit {

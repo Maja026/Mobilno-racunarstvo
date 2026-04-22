@@ -1,34 +1,49 @@
 <ion-header>
+
   <ion-toolbar color="primary">
-    <div class="header-flex">
-      <div class="header-title">
-        Movies / Series Rating App
-      </div>
-      <div class="header-buttons">
-        <ion-button size="small" (click)="goToProfile()">Profile</ion-button>
-        <ion-button size="small" color="light" (click)="logout()">Logout</ion-button>
-      </div>
-    </div>
+
+  <ion-buttons slot="start">
+    <ion-menu-button></ion-menu-button>
+  </ion-buttons>
+
+  <ion-title>
+    Movies / Series Rating App
+  </ion-title>
+
+</ion-toolbar>
 
 
-    <ion-searchbar
-      placeholder="Search movies/series"
-      [(ngModel)]="searchTerm"
-      (ionInput)="applyFilter()">
-    </ion-searchbar>
-  </ion-toolbar>
+  <ion-searchbar
+    placeholder="Search movies/series"
+    [(ngModel)]="searchTerm"
+    (ionInput)="applyFilter()">
+  </ion-searchbar>
+
 </ion-header>
+
 
 <ion-content>
 
+  <ion-segment
+    [(ngModel)]="filter"
+    (ionChange)="applyFilter()"
+    class="segment-filter">
 
-  <ion-segment [(ngModel)]="filter" (ionChange)="applyFilter()" class="segment-filter">
-    <ion-segment-button value="movie">Movies</ion-segment-button>
-    <ion-segment-button value="series">Series</ion-segment-button>
+    <ion-segment-button value="movie">
+      Movies
+    </ion-segment-button>
+
+    <ion-segment-button value="series">
+      Series
+    </ion-segment-button>
+
   </ion-segment>
 
   <ion-list>
-    <ion-item *ngFor="let movie of filteredMovies" (click)="goToDetails(movie.id!)">
+
+    <ion-item
+      *ngFor="let movie of filteredMovies"
+      (click)="goToDetails(movie.id!)">
 
       <ion-thumbnail slot="start" *ngIf="movie.imageURL">
         <img [src]="movie.imageURL.trim()" />
@@ -36,16 +51,34 @@
 
       <ion-label>
         <h2>{{ movie.title }}</h2>
-        <p class="description" *ngIf="movie.description">{{ movie.description }}</p>
-        <p *ngIf="movie.type">Type: {{ movie.type }}</p>
+
+        <p class="description" *ngIf="movie.description">
+          {{ movie.description }}
+        </p>
+
+        <p *ngIf="movie.type">
+          Type: {{ movie.type }}
+        </p>
       </ion-label>
 
       <ion-buttons slot="end">
-        <ion-button color="primary" (click)="addToWatchLater(movie.id!); $event.stopPropagation()">Watch later</ion-button>
-        <ion-button color="success" (click)="markAsSeen(movie.id!); $event.stopPropagation()">Seen</ion-button>
+
+        <ion-button
+          color="primary"
+          (click)="addToWatchLater(movie.id!); $event.stopPropagation()">
+          Watch later
+        </ion-button>
+
+        <ion-button
+          color="success"
+          (click)="markAsSeen(movie.id!); $event.stopPropagation()">
+          Seen
+        </ion-button>
+
       </ion-buttons>
 
     </ion-item>
+
   </ion-list>
 
 </ion-content>
