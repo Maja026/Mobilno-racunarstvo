@@ -61,7 +61,7 @@ async submitRating() {
     comment: this.comment
   };
 
-  await this.ratingService.addRating(newRating); 
+  await this.ratingService.addRatingPost(newRating);
   this.modalCtrl.dismiss();
 }
 

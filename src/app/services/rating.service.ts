@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { FirebaseHttpService } from './firebase-http.service';
 
 export interface Rating {
+  id?: string;
   movieId: string;
   userId: string;
   rating: number;
   comment: string;
   timestamp?: number;
+  userEmail?: string;
 }
 
 @Injectable({
@@ -26,6 +28,12 @@ export class RatingService {
     });
   }
 
+  async addRatingPost(rating: Rating): Promise<void> {
+  await this.http.post('ratings', {
+    ...rating,
+    timestamp: Date.now()
+  });
+}
 
   async getAllRatings(): Promise<Rating[]> {
     const data = await this.http.get('ratings');
@@ -34,6 +42,7 @@ export class RatingService {
     const ratingsObj: { [key: string]: any } = data;
 
     return Object.keys(ratingsObj).map(key => ({
+      id: key,
       movieId: ratingsObj[key].movieId,
       userId: ratingsObj[key].userId,
       rating: ratingsObj[key].rating,

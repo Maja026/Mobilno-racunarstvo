@@ -69,9 +69,7 @@ export class RatingsEditPage implements OnInit {
           text: 'Save',
           handler: async (data) => {
 
-            const ratingId = `${rating.userId}_${rating.movieId}`;
-
-            await this.ratingService.updateRating(ratingId, {
+            await this.ratingService.updateRating(rating.id!, {
               ...rating,
               rating: Number(data.rating),
               comment: data.comment
@@ -96,9 +94,7 @@ export class RatingsEditPage implements OnInit {
           role: 'destructive',
           handler: async () => {
 
-            const ratingId = `${rating.userId}_${rating.movieId}`;
-
-            await this.ratingService.deleteRating(ratingId);
+            await this.ratingService.deleteRating(rating.id!);
 
             await this.loadRatings();
           }
