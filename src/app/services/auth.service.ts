@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { FirebaseHttpService } from './firebase-http.service';
+import { environment } from './../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private API_KEY = "AIzaSyAoLmPiE2Nt4R_gfB7lvGQV1I2x8MjAZ9E";
+  private API_KEY = environment.firebaseConfig.apiKey;
 
   constructor(private http: FirebaseHttpService) {}
 
